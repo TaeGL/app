@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.app.project.recipe.dao.IRECIPE_DAO">
+
+
+<insert id="insertRecipe" parameterType="com.spring.app.project.recipe.dto.Recipe_DTO">
+	INSERT INTO RECIPE_TB VALUES
+	(RECIPE_SEQ.NEXTVAL, #{recipe_name}, #{recipe_image}, #{user_id}, #{recipe_category}, #{cook_ingredient}, #{recipe_contents}, 0,0, sysdate)
+</insert>
+
+<select id="recipeTotalCnt" resultType="int">
+	SELECT COUNT(*) FROM RECIPE_TB
+</select>
+
+<select id="recipeList" resultType="com.spring.app.project.recipe.dto.Recipe_DTO">
+	SELECT * FROM (SELECT ROWNUM rn, tb.* FROM (SELECT * FROM RECIPE_TB ORDER BY RECIPE_NO DESC )tb) WHERE rn BETWEEN #{first} AND #{last}
+</select>
+
+<select id="getRecipe" resultType="com.spring.app.project.recipe.dto.Recipe_DTO">
+	SELECT * FROM RECIPE_TB WHERE recipe_no = #{rNo}
+</select>
+
+<select id="rnMax" resultType="int" parameterType="String">
+	SELECT MAX(RECIPE_NO) FROM RECIPE_TB WHERE USER_ID = #{userId}
+</select>
+
+<select id="selectRecipe" resultType="com.spring.app.project.recipe.dto.Recipe_DTO">
+	SELECT * FROM RECIPE_TB WHERE recipe_no = #{rNo} AND user_id = #{userId}
+</select>
+
+<insert id="insertRecipeLike">
+	INSERT INTO RECIPE_LIKE_TB VALUES
+	(RL_SEQ.NEXTVAL, #{rNo}, #{userId})
+</insert>
+
+<delete id="deleteRecipeLike">
+	DELETE FROM RECIPE_LIKE_TB WHERE RECIPE_NO = #{rNo} AND USER_ID = #{userId}
+</delete>
+
+<select id="selectRecipeLike" resultType="com.spring.app.project.recipe.dto.RecipeLike_DTO">
+	SELECT * FROM RECIPE_LIKE_TB WHERE RECIPE_NO = #{rNo} AND USER_ID = #{userId}
+</select>
+
+<update id="addRecipeLike">
+	UPDATE RECIPE_TB SET RECIPE_LIKE =RECIPE_LIKE + 1 WHERE RECIPE_NO = #{rNo}
+</update>
+
+<update id="removeRecipeLike">
+	UPDATE RECIPE_TB SET RECIPE_LIKE =RECIPE_LIKE - 1 WHERE RECIPE_NO = #{rNo}
+</update>
+
+<select id="selectRecipeRno" resultType="com.spring.app.project.recipe.dto.Recipe_DTO" parameterType="int">
+	SELECT * FROM RECIPE_TB WHERE recipe_no = #{rNo}
+</select>
+
+
+<update id="updateRecipe" parameterType="com.spring.app.project.recipe.dto.Recipe_DTO">
+UPDATE PROJECT.RECIPE_TB
+SET RECIPE_NAME= #{recipe_name}, RECIPE_IMAGE=#{recipe_image}, USER_ID=#{user_id}, RECIPE_CATEGORY=#{recipe_category}, COOK_INGREDIENT=#{cook_ingredient}, RECIPE_CONTENTS=#{recipe_contents}, RECIPE_LIKE=#{recipe_like}, REVIEW_LIKE=#{review_like}
+WHERE RECIPE_NO=#{recipe_no}
+
+</update>
+
+<delete id="deleteRecipe" parameterType="int">
+DELETE FROM RECIPE_TB WHERE RECIPE_NO = #{rNo}
+</delete>
+
+<select id="seletReciepeUser" resultType="com.spring.app.project.recipe.dto.Recipe_DTO">
+SELECT * FROM RECIPE_TB WHERE USER_ID = #{user_id}
+</select>
+
+<select id="searchRecipe" resultType="com.spring.app.project.recipe.dto.Recipe_DTO">
+
+SELECT * FROM (SELECT ROWNUM rn,tb.* 
+	FROM (SELECT * 
+		FROM RECIPE_TB WHERE RECIPE_NAME LIKE '%' || #{search} || '%' OR CONTAINS(RECIPE_CONTENTS , '%' || #{search} || '%')>0 
+	ORDER BY RECIPE_NO DESC) tb)
+WHERE rn BETWEEN #{first} AND #{last}
+</select>
+
+
+<select id="searchRecipeTotalCnt" resultType="int" parameterType="String">
+	SELECT COUNT(*) FROM RECIPE_TB WHERE RECIPE_NAME LIKE '%' || #{search} || '%' OR CONTAINS(RECIPE_CONTENTS , '%' || #{search} || '%')>0
+</select>
+
+<delete id="deleteUserId" >
+	DELETE FROM RECIPE_TB WHERE USER_ID = #{user_id}
+</delete>
+
+<delete id="deleteRecipeLikeByUserId" parameterType="String">
+	DELETE FROM RECIPE_LIKE_TB WHERE USER_ID = #{user_id}
+</delete>
+
+<delete id="deleteRecipeLikeByRno" parameterType="int">
+	DELETE FROM RECIPE_LIKE_TB WHERE RECIPE_NO = #{rNo}
+</delete>
+
+</mapper>

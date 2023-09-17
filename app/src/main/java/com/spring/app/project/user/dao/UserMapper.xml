@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.app.project.user.dao.IUSER_DAO">
+
+<insert id="insertUser" parameterType="com.spring.app.project.user.dto.USER_DTO">
+		INSERT INTO USER_TB VALUES
+			(#{user_id},#{user_nick},#{user_pw},#{user_name},#{user_email},#{user_addr},#{user_grade})
+</insert>
+
+<select id="selectUser" resultType="com.spring.app.project.user.dto.USER_DTO" parameterType="String" >
+	SELECT * FROM USER_TB WHERE user_id = #{user_id}
+</select>
+
+<select id="selectUserEmail" resultType="com.spring.app.project.user.dto.USER_DTO" parameterType="String">
+	SELECT * FROM USER_TB WHERE user_email = #{email}
+</select>
+
+<insert id="insertUStatus" parameterType="com.spring.app.project.user.dto.USER_STATUS">
+	INSERT INTO USER_STATUS VALUES(#{user_email} , NULL , NULL )
+</insert>
+
+<update id="updateUStatus" parameterType="String">
+	UPDATE USER_STATUS SET USER_STATUS=#{status} WHERE USER_EMAIL=#{email}
+</update>
+	
+	<select id="selectUSEmail" parameterType="String" resultType="com.spring.app.project.user.dto.USER_STATUS">
+		SELECT * FROM USER_STATUS WHERE USER_EMAIL = #{email}
+	</select>
+
+<select id="selectUserEmailId" resultType="com.spring.app.project.user.dto.USER_DTO">
+	SELECT * FROM USER_TB WHERE user_email = #{email} AND user_id = #{user_id}
+</select>
+
+
+<update id="updateUserPw">
+	UPDATE USER_TB SET USER_PW = #{code} WHERE USER_ID = #{user_id}
+</update>
+
+<select id="myRecipeList" resultType="com.spring.app.project.recipe.dto.Recipe_DTO">
+	SELECT * FROM (SELECT ROWNUM rn,tb.* FROM (SELECT * FROM RECIPE_TB WHERE USER_ID = #{user_id} ORDER BY RECIPE_NO DESC )tb) WHERE rn BETWEEN #{first} AND #{last}
+</select>
+
+<update id="updateUser">
+	UPDATE PROJECT.USER_TB
+		SET USER_ID=#{user.user_id}, 
+		USER_NICK=#{user.user_nick}, 
+		USER_PW=#{user.user_pw}, 
+		USER_NAME=#{user.user_name}, 
+		USER_ADDR=#{user.user_addr}, 
+		USER_GRADE=#{user.user_grade},
+		USER_EMAIL=#{user.user_email}
+		WHERE USER_ID=#{user_id}
+	
+</update>
+
+<select id="myRecipeCnt" resultType="int">
+		SELECT COUNT(*) FROM RECIPE_TB WHERE USER_ID=#{user_id}
+</select>
+
+<select id="myRecipeComments" resultType="com.spring.app.project.recipe.dto.RecipeComent_DTO">
+
+SELECT * FROM (SELECT ROWNUM rn,tb.* FROM (SELECT * FROM RECIPE_COMMENT_TB WHERE USER_ID = #{user_id} ORDER BY COMMENT_NO DESC )tb) WHERE rn BETWEEN #{first} AND #{last}
+</select>
+
+<select id="myRecipeCommentsCnt" resultType="int">
+	SELECT COUNT(*) FROM RECIPE_COMMENT_TB WHERE USER_ID=#{user_id}
+</select>
+
+
+<delete id="deleteUStatus" parameterType="String">
+	DELETE FROM USER_STATUS WHERE USER_EMAIL = #{email} 
+</delete>
+
+<delete id="deleteUser" parameterType="String">
+	DELETE FROM USER_TB WHERE USER_EMAIL = #{email}
+</delete>
+
+</mapper>

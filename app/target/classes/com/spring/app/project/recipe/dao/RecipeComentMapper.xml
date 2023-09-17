@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.app.project.recipe.dao.IRecipeComentDao">
+
+	<insert id="insert" parameterType="com.spring.app.project.recipe.dto.RecipeComent_DTO">
+		INSERT INTO RECIPE_COMMENT_TB VALUES
+		(RECIPE_COMMENT_SEQ.NEXTVAL, #{recipe_no}, #{user_id}, #{user_grade}, #{recipe_comment}, sysdate, #{recipe_name})
+	</insert>
+	
+	<select id="select" resultType="com.spring.app.project.recipe.dto.RecipeComent_DTO">
+		SELECT * FROM (SELECT * FROM RECIPE_COMMENT_TB ORDER BY COMMENT_NO DESC ) WHERE RECIPE_NO = #{rNo}
+	</select>
+	
+	
+	<update id="rcUpdate">
+	UPDATE PROJECT.RECIPE_COMMENT_TB
+SET RECIPE_NO=#{rc.recipe_no}, USER_ID=#{rc.user_id}, USER_GRADE=#{rc.user_grade}, RECIPE_COMMENT=#{rc.recipe_comment}, RECIPE_NAME=#{rc.recipe_name}
+WHERE COMMENT_NO=#{rc.comment_no}
+	
+</update>
+	
+<select id="selelctAll" resultType="com.spring.app.project.recipe.dto.RecipeComent_DTO">
+	SELECT * FROM RECIPE_COMMENT_TB
+</select>
+
+	<select id="selectRcno" resultType="com.spring.app.project.recipe.dto.RecipeComent_DTO">
+		SELECT * FROM RECIPE_COMMENT_TB WHERE COMMENT_NO = #{rcNo}
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM RECIPE_COMMENT_TB WHERE COMMENT_NO = #{rcNo}
+	</delete>
+	
+	<delete id="deleteUserId" parameterType="String">
+		DELETE FROM RECIPE_COMMENT_TB WHERE USER_ID = #{user_id}
+	</delete>
+	
+	<delete id="deleteRecipeCommentByRno" parameterType="int">
+		DELETE FROM RECIPE_COMMENT_TB WHERE RECIPE_NO = #{rNo}
+	</delete>
+</mapper>

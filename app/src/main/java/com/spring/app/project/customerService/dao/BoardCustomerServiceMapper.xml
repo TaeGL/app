@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.app.project.customerService.dao.IBoardCustomerService_DAO">
+
+<select id="selectCsAll" resultType="com.spring.app.project.customerService.dto.BoardCustomerService_DTO">
+	SELECT * FROM CUSTOMER_SERVICE_BOARD_TB
+</select>
+
+<select id="boardCSTotalCnt" resultType="int">
+
+	SELECT COUNT(*) FROM CUSTOMER_SERVICE_BOARD_TB
+</select>
+
+<select id="boardCSList" resultType="com.spring.app.project.customerService.dto.BoardCustomerService_DTO">
+
+	SELECT * FROM (SELECT ROWNUM rn, tb.* FROM (SELECT BOARD_NO,BOARD_TITLE,BOARD_TYPE,BOARD_CONTENT,TO_CHAR( BOARD_DATE , 'YYYY-MM-DD' )board_date FROM CUSTOMER_SERVICE_BOARD_TB ORDER BY board_no DESC )tb) WHERE rn BETWEEN #{first} AND #{last}
+	
+</select>
+
+<select id="selectCsByBno" resultType="com.spring.app.project.customerService.dto.BoardCustomerService_DTO" parameterType="int">
+	SELECT BOARD_NO,BOARD_TITLE,BOARD_TYPE,BOARD_CONTENT,TO_CHAR( BOARD_DATE , 'YYYY-MM-DD' )board_date FROM CUSTOMER_SERVICE_BOARD_TB WHERE BOARD_NO = #{bNo}
+</select>
+
+
+<update id="updateCs" parameterType="com.spring.app.project.customerService.dto.BoardCustomerService_DTO">
+	UPDATE CUSTOMER_SERVICE_BOARD_TB SET BOARD_TITLE = #{board_title} , BOARD_CONTENT = #{board_content} WHERE BOARD_NO = #{board_no} 
+</update>
+
+<insert id="csInsert" parameterType="com.spring.app.project.customerService.dto.BoardCustomerService_DTO">
+	INSERT INTO PROJECT.CUSTOMER_SERVICE_BOARD_TB
+	(BOARD_NO, BOARD_TITLE, BOARD_TYPE, BOARD_CONTENT, BOARD_DATE)								 
+	VALUES(SEQ_CUSTOMER_SERVICE.NEXTVAL , #{ board_title }, #{ board_type } , #{ board_content} , sysdate)
+											 
+</insert>
+
+<delete id="deleteCs" parameterType="int">
+	DELETE FROM CUSTOMER_SERVICE_BOARD_TB WHERE BOARD_NO = #{bNo}
+</delete>
+
+<select id="questionToAdminListByUserId" resultType="com.spring.app.project.customerService.dto.BoardQuestionToAdmin_DTO">
+	SELECT * FROM (SELECT ROWNUM rn, tb.* FROM (SELECT BOARD_NO,BOARD_TITLE,BOARD_TYPE,BOARD_CONTENT,BOARD_STATE,USER_ID,TO_CHAR( BOARD_DATE , 'YYYY-MM-DD' )board_date FROM Board_QuestionToAdmin WHERE USER_ID = #{user_id} ORDER BY board_no DESC )tb) WHERE rn BETWEEN #{first} AND #{last}
+</select>
+
+<select id="questionToAdminList" resultType="com.spring.app.project.customerService.dto.BoardQuestionToAdmin_DTO">
+	SELECT * FROM (SELECT ROWNUM rn, tb.* FROM (SELECT BOARD_NO,BOARD_TITLE,BOARD_TYPE,BOARD_CONTENT,BOARD_STATE,USER_ID,TO_CHAR( BOARD_DATE , 'YYYY-MM-DD' )board_date FROM Board_QuestionToAdmin ORDER BY board_no DESC )tb) WHERE rn BETWEEN #{first} AND #{last}
+</select>
+
+<select id="questionTotalCntByUserId" resultType="int">
+	SELECT COUNT(*) FROM Board_QuestionToAdmin WHERE user_id = #{user_id}
+</select>
+
+<select id="questionTotalCnt" resultType="int">
+	SELECT COUNT(*) FROM Board_QuestionToAdmin
+</select>
+
+
+<insert id="insertQuestion" parameterType="com.spring.app.project.customerService.dto.BoardQuestionToAdmin_DTO">
+
+	INSERT INTO PROJECT.BOARD_QUESTIONTOADMIN
+	(BOARD_NO, BOARD_TITLE, BOARD_TYPE, BOARD_CONTENT, BOARD_STATE, USER_ID, BOARD_DATE)
+	VALUES(SEQ_QUESTION_BOARD.NEXTVAL,  #{ board_title }, #{ board_type }, #{ board_content}, 'none' , #{user_id}, sysdate)
+		
+</insert>
+
+<select id="selectQuestionByBno" parameterType="int" resultType="com.spring.app.project.customerService.dto.BoardQuestionToAdmin_DTO">
+	
+SELECT BOARD_NO, BOARD_TITLE, BOARD_TYPE, BOARD_CONTENT, BOARD_STATE, USER_ID, TO_CHAR(BOARD_DATE , 'YYYY-MM-DD')board_date
+FROM PROJECT.BOARD_QUESTIONTOADMIN WHERE BOARD_NO = #{bNo}
+
+</select>
+	
+	<select id="selectQuestionCommentByBno" parameterType="int" resultType="com.spring.app.project.customerService.dto.QuestionComments_DTO">
+		
+SELECT COMMENT_NO, BOARD_NO, USER_ID, QUESTION_COMMENT, TO_CHAR(COMMENT_DATE,'YYYY-MM-DD')comment_date
+FROM PROJECT.QUESTION_COMMENTS WHERE BOARD_NO = #{bNo}
+	</select>
+	
+	<delete id="deleteQuestion" parameterType="int">
+		
+		DELETE FROM BOARD_QUESTIONTOADMIN WHERE BOARD_NO =#{bNo}
+	</delete>
+	
+	<insert id="insertQuestionComment" parameterType="com.spring.app.project.customerService.dto.QuestionComments_DTO">
+		INSERT INTO PROJECT.QUESTION_COMMENTS
+		(COMMENT_NO, BOARD_NO, USER_ID, QUESTION_COMMENT, COMMENT_DATE)
+		VALUES(SEQ_QUESTIONCOMMENTS.NEXTVAL, #{board_no}, #{user_id}, #{question_comment}, sysdate)
+	</insert>
+	
+	<delete id="deleteQuestionComments" parameterType="int">
+		DELETE FROM PROJECT.QUESTION_COMMENTS
+		WHERE COMMENT_NO=#{cNo}
+		
+	</delete>
+	
+	<select id="selectQuestionCommentByCno" parameterType="int" resultType="com.spring.app.project.customerService.dto.QuestionComments_DTO">
+		SELECT COMMENT_NO, BOARD_NO, USER_ID, QUESTION_COMMENT, TO_CHAR(COMMENT_DATE,'YYYY-MM-DD')comment_date
+		FROM PROJECT.QUESTION_COMMENTS WHERE COMMENT_NO = #{cNo}
+	</select>
+	
+	<update id="updateQuestionToAdmin" parameterType="com.spring.app.project.customerService.dto.BoardQuestionToAdmin_DTO">
+		
+		UPDATE PROJECT.BOARD_QUESTIONTOADMIN
+		SET BOARD_TITLE=#{board_title}, BOARD_TYPE=#{board_type}, BOARD_CONTENT=#{board_content}, BOARD_STATE=#{board_state}, USER_ID=#{user_id}
+		WHERE BOARD_NO= #{board_no}
+				
+	</update>
+	
+</mapper>
+
