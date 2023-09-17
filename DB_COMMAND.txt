@@ -1,0 +1,257 @@
+
+=============================================
+
+	oracle 설정
+
+=============================================
+
+
+// db 계정 project 생성
+create user project identified by project;
+// project 권한 부여
+grant resource,connect,dba to ap;
+
+// long 타입 인덱스 사용
+SQL> alter user ctxsys account unlock;
+SQL> grant ctxapp to news;
+
+
+
+
+=============================================
+
+	테이블 설정
+
+=============================================
+
+
+// 유저 테이블
+CREATE TABLE USER_TB(
+	user_id varchar2(300),
+	user_nick varchar2(300) not null,
+	user_pw varchar2(300) not null,
+	user_name varchar2(300) not null,
+	user_email varchar2(300) not null,
+	user_addr varchar2(300) ,
+	user_grade varchar2(300) not null,
+	constraint "user_pk" PRIMARY KEY(user_id)
+);
+
+// 유저 state 테이블
+CREATE TABLE USER_STATUS(
+	user_email varchar2(300),
+	user_id varchar2(300),
+	user_status varchar2(300),
+	constraint "userState_pk" PRIMARY KEY(user_email)
+);
+
+// 레시피 Like 테이블
+CREATE TABLE RECIPE_LIKE_TB(
+	RL_NO number , 
+	RECIPE_NO number ,
+	user_id varchar2(300) ,
+	constraint "recipeLike_pk" PRIMARY KEY(RL_NO)
+);
+
+// 레시피 테이블
+CREATE TABLE RECIPE_TB(
+	recipe_no number , 
+	recipe_name varchar2(300) not null , 
+	recipe_image varchar2(300) ,
+	user_id varchar2(300) not null,
+	recipe_category varchar2(300) ,
+	cook_ingredient varchar2(300) ,
+	recipe_contents long not null , 
+	recipe_like number,
+	review_like number ,
+	recipe_date date ,
+	
+	constraint "recipe_pk" PRIMARY KEY(recipe_no),
+	constraint "recipe_fk_user_id" FOREIGN KEY(user_id) REFERENCES USER_TB(USER_ID)
+
+);
+
+CREATE SEQUENCE RECIPE_SEQ;
+
+CREATE INDEX RECIPE_CONTENTS_IDX ON RECIPE_TB(RECIPE_CONTENTS)
+indextype IS ctxsys.context;
+
+
+// 레시피 댓글 테이블
+CREATE TABLE RECIPE_COMMENT_TB(
+	COMMENT_NO NUMBER ,
+	RECIPE_NO NUMBER ,
+	USER_ID VARCHAR2(300),
+	USER_GRADE VARCHAR2(300),
+	RECIPE_COMMENT LONG,
+	COMMENT_DATE DATE,
+	RECIPE_NAME VARCHAR2(300),
+	CONSTRAINTS RECIPE_COMMENT_PK PRIMARY KEY(COMMENT_NO),
+	CONSTRAINTS RECIPE_COMMENT_FK FOREIGN KEY(USER_ID) REFERENCES USER_TB(USER_ID)
+	
+);
+
+
+
+// 공지사항 테이블
+CREATE TABLE CUSTOMER_SERVICE_BOARD_TB(
+	board_no NUMBER ,
+	board_title VARCHAR2(300),
+	board_type VARCHAR2(300),
+	board_content LONG,
+	board_date DATE ,
+	
+	CONSTRAINT CS_BOARD_PK PRIMARY KEY(board_no)
+);
+
+// 1:1 문의 테이블
+CREATE TABLE Board_QuestionToAdmin(
+	board_no NUMBER,
+	board_title VARCHAR2(300),
+	board_type VARCHAR2(300),
+	board_content LONG,
+	board_state VARCHAR2(300),
+	user_id VARCHAR2(300),
+	board_date DATE,
+
+	CONSTRAINT Question_BOARD_PK PRIMARY KEY(board_no)
+);
+
+
+// 문의 답글
+CREATE TABLE QUESTION_COMMENTS(
+ 	comment_no NUMBER,
+	board_no NUMBER, 
+	user_id VARCHAR2(300),
+	question_comment LONG,
+	comment_date DATE,
+
+	CONSTRAINT "QC_PK" PRIMARY KEY(comment_no)
+);
+
+
+
+// 관계자 계정 설정
+INSERT INTO PROJECT.USER_TB
+(USER_ID, USER_NICK, USER_PW, USER_NAME, USER_EMAIL, USER_ADDR, USER_GRADE)
+VALUES('admin', '고객지원팀', 'admin', '고객지원팀', 'recipe_help@recipe.co.kr', '서울시 용산구 원효로0가 00번지', '운영자');
+
+
+
+
+
+
+
+
+=============================================
+
+	홈 간단한 레시피 등록
+
+=============================================
+
+
+
+
+// 카레 두부부침 레시피
+INSERT INTO PROJECT.RECIPE_TB
+(RECIPE_NO, RECIPE_NAME, RECIPE_IMAGE, USER_ID, RECIPE_CATEGORY, COOK_INGREDIENT, RECIPE_CONTENTS, RECIPE_LIKE, REVIEW_LIKE, RECIPE_DATE)
+VALUES(241, '카레 두부부침', '959017b5-4743-4a35-bd09-de648075642etofu.png', 'id', 'pork1', '재료:
+두부 1
+모밀가루 1.5
+큰술카레가루 1
+큰술파슬리가루 
+약간계란 2개
+양념: 소금 1꼬집', '요리 과정
+
+두부는 1cm 이상으로 썰어서 소금 아주 살짝만 뿌려주세요.
+
+분량의 카레가루와 밀가루를 섞어서 썰어놓은 두부에 옷을 골고루 입혀주세요.
+계란을 풀어서 파슬리가루를 조금 넣고 섞어주세요.
+
+카레와 밀가루옷을 입힌 두부를 다시 계란물을 입혀주세요.
+
+달궈진 팬에 기름을 두르고 두부를 넣어 앞뒤로 노릇노릇 부쳐주시면 된답니다.
+
+카레향이 솔솔 나서 더 맛있는 카레 두부부침 완성!', 0, 0, sysdate);
+
+
+//닭날개 조림 레시피
+INSERT INTO PROJECT.RECIPE_TB
+(RECIPE_NO, RECIPE_NAME, RECIPE_IMAGE, USER_ID, RECIPE_CATEGORY, COOK_INGREDIENT, RECIPE_CONTENTS, RECIPE_LIKE, REVIEW_LIKE, RECIPE_DATE)
+VALUES(242, '닭날개 조림', 
+'35ab82b7-7880-4004-b276-96e267533cb7chichen.png', 
+'admin', 
+'pork1', 
+
+'재료:
+닭날개 15개전분가루 3큰술튀김유후추가루정종
+양념장:
+간장 2T굴소스 1T레드와인 4T올리고당 1T배즙 1/2컵(100ml)다진마늘 1T후추가루', 
+
+
+'닭날개에 칼집을 넣어 준 후 볼에 담아 정종과 후추가루를 뿌려주세요.
+
+전분가루를 골고루 묻혀주세요.
+
+위의 양념장 분량대로 양념장을 만들어 주세요.
+
+후라이팬에 기름을 넉넉히 두르고 전분가루 묻힌 닭날개를 노릇노릇하게 구워주세요.
+
+다른팬에 미리 만들어 놓은 양념장을 넣고 바글바글 끓여주세요.
+
+바글바글 끓는 양념장에 닭날개를 넣고 빠르게 휘리릭 버무려주시면 됩니다.', 0, 0, sysdate);
+
+
+
+
+//돼지김치찌개
+INSERT INTO PROJECT.RECIPE_TB
+(RECIPE_NO, RECIPE_NAME, RECIPE_IMAGE, USER_ID, RECIPE_CATEGORY, COOK_INGREDIENT, RECIPE_CONTENTS, RECIPE_LIKE, REVIEW_LIKE, RECIPE_DATE)
+VALUES(243, '돼지김치찌개', 
+'6a3c2d15-2d43-44fa-8083-d7a3a1742573kimchiPork.png', 
+'admin', 
+'pork1', 
+
+'재료:
+삼겹살 300g김치 1/4포기대파 9cm당근 1/5개양파 1/2개새송이버섯 2개
+양념:
+고추장 1T고춧가루 2T소주 2T다진마늘 1/2T키위간것 1T간양파 1/2T후추 1/4T', 
+
+
+'TV 속 레시피에는 오겹살을 준비하였는데 전 삼겹살로 준비하였습니다. 삼겹살은 2cm 두께로 자르는 것이 좋다고 합니다. 김치는 김칫소를 제거하고 물기를 가볍게 짜 줍니다. 3cm 간격으로 김치를 잘라 줍니다.
+
+양파, 당근, 대파는 고기와 비슷한 크기로 잘라 줍니다. 전 새송이 버섯은 없어서 생략 했습니다.
+
+분량의 양념장을 만들어 줍니다. 키위를 넣어줌으로해서 연육작용으로 고기를 부드럽게 만들어 주며 간양파는 감칠맛을 살려 줍니다. 전 키위가 없어 대신 사과를 갈아 넣어 주었습니다.
+
+재료가 준비 되었으면 팬에 카놀라유(식용유, 포도씨유등) 2T, 소주2T을 넣고 삼겹살을 넣어 준 후 후추를 1/4T을 넣고 센불에서 3분 중간불에서 2분간 볶아 줍니다. 고기가 어느정도 익으면 손질한 양파, 새송이버섯, 김치, 고춧가루1T을 넣고 볶아 줍니다. 미리 만들어 둔 양념장2T과 물엿2T, 참기름1/3T, 손질한 대파를 넣고 센 불로 1분간 볶아 줍니다.
+
+
+돼지고기를 먼저 볶아 내어 전혀 육즙이 빠져 나가지 않고 고소하면서 담백하고 김치와 야채를 빠른 시간안에 볶아 내어 아삭한 식감이 그대로 살아 있지요.', 0, 0, sysdate);
+
+
+
+//만두 어묵국
+INSERT INTO PROJECT.RECIPE_TB
+(RECIPE_NO, RECIPE_NAME, RECIPE_IMAGE, USER_ID, RECIPE_CATEGORY, COOK_INGREDIENT, RECIPE_CONTENTS, RECIPE_LIKE, REVIEW_LIKE, RECIPE_DATE)
+VALUES(244, '만두 어묵국', 
+'1689333b-f5b6-4415-972a-de5f20aae4c1fishCake.png', 
+'admin', 
+'pork1', 
+
+'재료:
+어묵 1봉지 (200~300g)알감자만두 10개 내외무 2cm고추 약간멸치국물 5~6컵
+양념:
+국간장 약간', 
+
+'미리 맛국물을 끓여준비합니다. 맑은 국일 수록 국물 내는게 중요한데요, 특히 어묵국은 맛을 내기가 쉽지 않아요. 
+조미료를 안넣는 대신 집에있는 모든 재료를 넣어서 국물을 냈습니다. 
+(멸치, 다시마, 새우머리, 황태포, 무, 파뿌리 등) 
+국물을 끓여서 우러나게 한다음 다시마는 빼내고 나머지재료는 그냥 넣고 식을 때까지 푸욱 넣어둡니다.
+국물 재료들을 건져내고 물을 적당히 잡은 다음 나박나박하게 썬 다음 끓여주세요. 
+무는 몸통을 썰 때 2cm정도 썰어서 이용한다는 의미구요, 나박썰어서 두줌정도 될꺼같네요.
+물이 무를 넣고 2~3분 뒤에 어묵을 넣고 끓여주세요.
+오뎅이 조금씩 불어오르면 만두를 넣고 4분정도 더 끓여주고, 
+재료가 다익으면 파와 고추를 넣고 간을 봐서 국간장으로 간을 맞춰 마무리합니다. 
+밑국물에 각종재료가 들어가서 거기에서 자연적으로 단맛과 감칠맛이 나기 때문에 국간장으로만 간을 해도 충분해요. 
+약간 매콤함을 더하느라 고추를 넣었는데 저는 청양고추 다진걸 넣어 칼칼하게 먹기도 합니다.', 0, 0, sysdate);
